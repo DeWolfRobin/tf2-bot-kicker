@@ -318,6 +318,8 @@ def get_console():
         f.close()
 
 
+
+
 def read_console():
     global raw_console
     userids = list()
