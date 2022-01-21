@@ -357,9 +357,9 @@ def read_console():
             for player in players:
                 if player.steamid == line[1]:
                     if "DEFENDERS" in line[5]:
-                        player.team = "BLUE"
-                    elif "INVADERS" in line[5]:
                         player.team = "RED"
+                    elif "INVADERS" in line[5]:
+                        player.team = "BLUE"
                     if player.name == myname.lower():
                         myteam = player.team
                         print("my team is ", player.team)
