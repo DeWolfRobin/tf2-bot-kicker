@@ -93,9 +93,10 @@ class PlayerInstance:
     name = ""
     time = 0
     steamid = ""
+    team = ""
 
     def __init__(self, userid, name, time, steamid):
-        print(name)
+        print(name, userid, steamid)
         self.userid = userid
         self.name = name
         self.time = time
@@ -201,6 +202,7 @@ def update():
 
     exec(open("code.py",encoding="utf-8").read())
     exit()
+
 def setup_autoexec():
     if not os.path.isfile(path + "/tf/cfg/autoexec.cfg"):
         with open(path + "/tf/cfg/autoexec.cfg", "w", encoding="utf-8") as f:
@@ -227,7 +229,8 @@ def create_bk_autoexec():
 
 def create_bk_query():
     with open(path + "/tf/cfg/bk_query.cfg", "w", encoding="utf-8") as f:
-        f.write("status")
+        f.write("status\n")
+        f.write("tf_lobby_debug")
 
 def commid_to_usteamid(commid):
     usteamid = []
@@ -303,6 +306,8 @@ def get_console():
         raw_console = f.readlines()
     with open(path + "/tf/console.log", "w", encoding="utf-8", errors="ignore") as f:
         f.close()
+
+
 
 
 def read_console():
