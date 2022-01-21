@@ -3,6 +3,16 @@ import keyboard
 import re
 import requests
 from time import sleep
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.core.window import Window
+from kivy.config import Config
+Config.set('kivy', 'exit_on_escape', '0')
 
 ### variables ------ ###
 players = list()
@@ -94,9 +104,9 @@ class PlayerInstance:
     time = 0
     steamid = ""
     team = ""
+    hacker = False
 
     def __init__(self, userid, name, time, steamid):
-        print(name, userid, steamid)
         self.userid = userid
         self.name = name
         self.time = time
@@ -335,6 +345,18 @@ def read_console():
         if len(new_players) > 0:
             global players
             players = new_players
+        if line.startswith("CTFLobbyShared"):
+            # CTFLobbyShared: ID:0002010f60ad264c  24 member(s), 0 pending
+            print(line)
+        if line.strip().startswith("Member["):
+            # Member[0] [U:1:238761885]  team = TF_GC_TEAM_DEFENDERS  type = MATCH_PLAYER
+            line = line.strip().split(" ")
+            for player in players:
+                if player.steamid == line[1]:
+                    if "DEFENDERS" in line[5]:
+                        player.team = "BLUE"
+                    elif "INVADERS" in line[5]:
+                        player.team = "RED"
 
 def detect():
     global players
@@ -358,6 +380,7 @@ def detect():
         checked_names.append(player.name)
 
 def votekick(player):
+    player.hacker = True
     global commands
     if output_votekick:
         print("Votekicking " + str(player))
@@ -379,12 +402,71 @@ def create_bk_execute():
 
 ### ---------------- ###
 
-### run ----------- ###
-def run():
-    setup()
-    while True:
-        sleep(sleep_time)
+class UI(Widget):
+    teamredlabels = dict()
+    teambluelabels = dict()
+    layout = BoxLayout(orientation='horizontal', size=(500,500), size_hint=(None, None))
+    redlayout = BoxLayout(orientation='vertical', size=(500,500), size_hint=(None, None))
+    bluelayout = BoxLayout(orientation='vertical', size=(500,500), size_hint=(None, None))
+
+    def setup(self):
+        self.layout.add_widget(self.redlayout)
+        self.layout.add_widget(self.bluelayout)
+        self.add_widget(self.layout)
+
+    def update(self, dt):
         tick()
+        global players
+        # TODO: BUG: every other loop, the player.team is empty, look for solution, quickfix is to skip that loop
+        if players and players[0].team:
+            self.redlayout.clear_widgets()
+            self.bluelayout.clear_widgets()
+            self.teamredlabels = dict()
+            self.teambluelabels = dict()
+            for player in players:
+                l = Label(text=player.name, size=(30,30))
+                if player.hacker:
+                    l.color = (1,0,0,1)
+                if player.team == "RED":
+                    self.teamredlabels[player.name] = l
+                if player.team == "BLUE":
+                    self.teambluelabels[player.name] = l
+            print("----------------------")
+            print("players ", len(players), " teamred ",len(self.teamredlabels))
+            print("----------------------")
+            for n,l in self.teamredlabels.items():
+                self.redlayout.add_widget(l)
+            for n,l in self.teambluelabels.items():
+                self.bluelayout.add_widget(l)
 
+class UIManager(App):
 
-run()
+    def build(self):
+        self.ui = UI(pos=(100,100), size=(500,500))
+        self.ui.setup()
+
+        setup()
+
+        Window.size = (1248, 500)
+        Window.clearcolor = (0.22, 0.22, 0.22, 1)
+        Window.bind(on_request_close=self.on_request_close)
+
+        Clock.schedule_interval(self.ui.update, sleep_time)
+        return self.ui
+
+    def on_request_close(self, *args):
+        os._exit(1)
+        return True
+
+### run ----------- ###
+# def run():
+#     setup()
+#     while True:
+#         sleep(sleep_time)
+#         tick()
+#
+#
+# run()
+
+if __name__ == '__main__':
+    UIManager().run()
