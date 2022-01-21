@@ -21,6 +21,8 @@ raw_console = list()
 
 chars = " !\"#$&'()*-+,./0123456789:;<=>?@[\\]^_{}|~abcdefghijklmnopqrstuvwxyzбвгджзклмнпрстфхцчшщаеёиоуыэюяйьъ"
 path = "/home/haywire/.local/share/Steam/steamapps/common/Team Fortress 2"
+myname = "Fenroar"
+myteam = None
 botnames = list()
 botregexnames = list()
 botsteamids = list()
@@ -351,12 +353,16 @@ def read_console():
         if line.strip().startswith("Member["):
             # Member[0] [U:1:238761885]  team = TF_GC_TEAM_DEFENDERS  type = MATCH_PLAYER
             line = line.strip().split(" ")
+            global myname
             for player in players:
                 if player.steamid == line[1]:
                     if "DEFENDERS" in line[5]:
                         player.team = "BLUE"
                     elif "INVADERS" in line[5]:
                         player.team = "RED"
+                    if player.name == myname.lower():
+                        myteam = player.team
+                        print("my team is ", player.team)
 
 def detect():
     global players
@@ -381,10 +387,13 @@ def detect():
 
 def votekick(player):
     player.hacker = True
-    global commands
-    if output_votekick:
-        print("Votekicking " + str(player))
-    commands.append("callvote kick " + str(player.userid))
+    print("Hacker detected: ", player.name)
+    global myteam
+    if player.team and player.team != myteam:
+        global commands
+        if output_votekick:
+            print("Votekicking " + str(player))
+        commands.append("callvote kick " + str(player.userid))
 
 def execute():
     if len(commands) > 0:
