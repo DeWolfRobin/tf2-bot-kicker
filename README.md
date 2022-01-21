@@ -6,7 +6,7 @@
 #### I'm planning on implementing more code for different bot types, an online database, and an auto-updater
 
 ## REQUIREMENTS
-- [Python 3 (or later)](https://www.python.org/downloads/)
+- [Python 3 (or later, but lower than 3.10)](https://www.python.org/downloads/)
 
 ## SETUP
 1. Download everything from [here](https://github.com/boyonkgit/tf2-bot-kicker/archive/refs/heads/main.zip)
@@ -17,7 +17,8 @@
 6. Go to "General"
 7. Under "Launch Options" add `-condebug`
 8. Configure `./config.properties` to your wishes (see below)
-9. You're good to go! Simply run the script using `start.bat`!
+9. Add your name in code.py where it says `myname=`
+10. You're good to go! Simply run the script using `start.bat`!
 
 ## CONFIGURING CONFIG.PROPERTIES
 Open the config.properties file with a simple text editor (I prefer Notepad++, regular Notepad will work as well)
