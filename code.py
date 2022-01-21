@@ -362,7 +362,6 @@ def read_console():
                         player.team = "BLUE"
                     if player.name == myname.lower():
                         myteam = player.team
-                        print("my team is ", player.team)
 
 def detect():
     global players
@@ -417,8 +416,10 @@ class UI(Widget):
     layout = BoxLayout(orientation='horizontal', size=(500,500), size_hint=(None, None))
     redlayout = BoxLayout(orientation='vertical', size=(500,500), size_hint=(None, None))
     bluelayout = BoxLayout(orientation='vertical', size=(500,500), size_hint=(None, None))
+    header = Label(text=f"players 0 teamred 0 teamblue 0", size=(700,1150))
 
     def setup(self):
+        self.add_widget(self.header)
         self.layout.add_widget(self.redlayout)
         self.layout.add_widget(self.bluelayout)
         self.add_widget(self.layout)
@@ -440,9 +441,7 @@ class UI(Widget):
                     self.teamredlabels[player.name] = l
                 if player.team == "BLUE":
                     self.teambluelabels[player.name] = l
-            print("----------------------")
-            print("players ", len(players), " teamred ",len(self.teamredlabels))
-            print("----------------------")
+            self.header.text = f"players {len(players)} teamred {len(self.teamredlabels)} teamblue {len(self.teambluelabels)}"
             for n,l in self.teamredlabels.items():
                 self.redlayout.add_widget(l)
             for n,l in self.teambluelabels.items():
@@ -451,12 +450,12 @@ class UI(Widget):
 class UIManager(App):
 
     def build(self):
-        self.ui = UI(pos=(100,100), size=(500,500))
+        self.ui = UI(pos=(100,100), size=(500,600))
         self.ui.setup()
 
         setup()
 
-        Window.size = (1248, 500)
+        Window.size = (1248, 600)
         Window.clearcolor = (0.22, 0.22, 0.22, 1)
         Window.bind(on_request_close=self.on_request_close)
 
