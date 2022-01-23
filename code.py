@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.config import Config
@@ -21,7 +22,8 @@ raw_console = list()
 
 chars = " !\"#$&'()*-+,./0123456789:;<=>?@[\\]^_{}|~abcdefghijklmnopqrstuvwxyzбвгджзклмнпрстфхцчшщаеёиоуыэюяйьъ"
 path = "/home/haywire/.local/share/Steam/steamapps/common/Team Fortress 2"
-myname = "Fenroar"
+# https://steamid.io/lookup/76561198086791620
+mysteamid3 = "[U:1:126525892]"
 myteam = None
 botnames = list()
 botregexnames = list()
@@ -353,14 +355,14 @@ def read_console():
         if line.strip().startswith("Member["):
             # Member[0] [U:1:238761885]  team = TF_GC_TEAM_DEFENDERS  type = MATCH_PLAYER
             line = line.strip().split(" ")
-            global myname
+            global mysteamid3
             for player in players:
                 if player.steamid == line[1]:
                     if "DEFENDERS" in line[5]:
                         player.team = "RED"
                     elif "INVADERS" in line[5]:
                         player.team = "BLUE"
-                    if player.name == myname.lower():
+                    if player.steamid == mysteamid3:
                         myteam = player.team
 
 def detect():
@@ -419,10 +421,10 @@ class UI(Widget):
     header = Label(text=f"players 0 teamred 0 teamblue 0", size=(700,1150))
 
     def setup(self):
-        self.add_widget(self.header)
         self.layout.add_widget(self.redlayout)
         self.layout.add_widget(self.bluelayout)
         self.add_widget(self.layout)
+        self.add_widget(self.header)
 
     def update(self, dt):
         tick()
@@ -434,9 +436,14 @@ class UI(Widget):
             self.teamredlabels = dict()
             self.teambluelabels = dict()
             for player in players:
-                l = Label(text=player.name, size=(30,30))
+                l = Button(text=player.name,
+                size_hint=(0.5, 0.1),
+                pos_hint={'left': .9, 'top': 1})
+                # l.bind(on_release = self.settings_popup.open)
                 if player.hacker:
                     l.color = (1,0,0,1)
+                if player.steamid == mysteamid3:
+                    l.color = (0,1,0,1)
                 if player.team == "RED":
                     self.teamredlabels[player.name] = l
                 if player.team == "BLUE":
