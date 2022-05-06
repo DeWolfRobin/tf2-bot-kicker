@@ -266,9 +266,22 @@ def get_bots():
     if online_database:
         files.append(requests.get("https://raw.githubusercontent.com/boyonkgit/tf2-bot-kicker/main/bots.properties").text.split("\n"))
         online_tf2db = requests.get("https://tf2bdd.pazer.us/v1/steamids").json()["players"]
+        biglist = requests.get("https://gist.githubusercontent.com/wgetJane/0bc01bd46d7695362253c5a2fa49f2e9/raw/playerlist.biglist.json").json()["players"]
+        milenko = requests.get("https://incontestableness.github.io/milenko-lists/playerlist.milenko-cumulative.json").json()["players"]
+        # moebkun = requests.get("https://raw.githubusercontent.com/moebkun/lists/main/rules.beta.json").json()["players"]
         b = list()
         for p in online_tf2db:
-            b.append(f"steamid={commid_to_usteamid(p['steamid'])}")
+            if 'cheater' in p['attributes']:
+                b.append(f"steamid={commid_to_usteamid(p['steamid'])}")
+        for p in biglist:
+            if 'cheater' in p['attributes']:
+                b.append(f"steamid={p['steamid']}")
+        for p in milenko:
+            if 'cheater' in p['attributes']:
+                b.append(f"steamid={p['steamid']}")
+        # for p in moebkun:
+        #     if 'cheater' in p['attributes']:
+        #         b.append(f"steamid={p['steamid']}")
         files.append(b)
     with open("bots.properties", "r",encoding="utf-8") as f:
         files.append(f.readlines())
@@ -437,7 +450,7 @@ class UI(Widget):
             self.teambluelabels = dict()
             for player in players:
                 l = Button(text=player.name,
-                size_hint=(0.5, 0.1),
+                size_hint=(0.9, 0.1),
                 pos_hint={'left': .9, 'top': 1})
                 # l.bind(on_release = self.settings_popup.open)
                 if player.hacker:
